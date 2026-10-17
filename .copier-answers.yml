@@ -1,9 +1,10 @@
 # Written by Copier from samclement/swhurl-app-template-kotlin; `copier update` reads it. Do not edit.
-_commit: v0.2.5
+_commit: v0.2.11
 _src_path: https://github.com/samclement/swhurl-app-template-kotlin.git
 api: none
 app_name: swhurl-try-17
 database: none
 description: New app deployment timing
 events: none
+flags: none
 kind: web

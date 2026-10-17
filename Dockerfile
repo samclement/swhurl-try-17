@@ -10,6 +10,7 @@ WORKDIR /src
 COPY gradlew settings.gradle.kts build.gradle.kts gradle.properties ./
 COPY gradle ./gradle
 RUN ./gradlew --no-daemon --quiet dependencies > /dev/null
+COPY swhurl.yaml ./
 COPY src ./src
 RUN ./gradlew --no-daemon check shadowJar copyAgent
 FROM gcr.io/distroless/cc-debian12:nonroot AS runtime

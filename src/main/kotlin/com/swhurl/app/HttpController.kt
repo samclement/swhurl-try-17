@@ -67,10 +67,11 @@ class HttpController(
 ) {
     private val log = LoggerFactory.getLogger(HttpController::class.java)
 
-    // The platform's readiness and liveness probe. It needs nothing else: the app answers only once
-    // started. Probe requests are not traced.
+    // The platform's readiness and liveness probe: the app answers only once started, and reports not ready until its feature flag overrides have arrived
+    // (at most 5 s; FlagWatcher). Probe requests are not traced.
     @Get("/healthz")
-    fun health(): Health = Health(true)
+    fun health(): HttpResponse<Health> =
+        if (Flags.store.loaded) HttpResponse.ok(Health(true)) else HttpResponse.status<Health>(HttpStatus.SERVICE_UNAVAILABLE).body(Health(false))
 
     private fun caller(request: HttpRequest<*>): Caller =
         request.getAttribute(CALLER, Caller::class.java).orElse(Caller("anonymous", null))
@@ -86,7 +87,7 @@ class HttpController(
     }
 
     // An example of calling another app: GET /call/orders asks the app "orders" for its "/" and returns
-    // what it said. It works once this app declares the call (calls: [orders] in swhurl.yaml).
+    // what it said. It works once the platform grants this app the call (make app-calls).
     @Get("/call/{name}")
     fun call(@PathVariable name: String, request: HttpRequest<*>): HttpResponse<Called> {
         val result = try {
